@@ -5,7 +5,7 @@ from faker import Faker
 # 1. Setup SQLite and Faker
 
 fake = Faker('en_AU')  # Uses the Australian locale for realistic names/cities
-connection = sqlite3.connect(DB_PATH)
+connection = sqlite3.connect("data.db")
 cursor = connection.cursor()
 
 print("🌱 Starting database seeding...")
