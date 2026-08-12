@@ -57,11 +57,13 @@ def book_flight(flight_id):
             VALUES (?, ?, ?)
         ''', (flight_id, passenger_id, '12A'))
 
+        booking_id = cursor.lastrowid
+
         conn.commit()
         conn.close()
 
         # 4. Redirect back to the homepage after a successful database save
-        return redirect(url_for('index'))
+        return redirect(f"/confirmation/{booking_id}")
 
     else:
         # GET Request: Fetch the details of the specific flight to show on the form page
@@ -78,7 +80,7 @@ def booking_confirmation(booking_id):
     # SQL JOIN to grab Passenger, Flight, and Booking details in one query
     query = '''
         SELECT b.booking_id, b.seat_assignment, p.first_name, p.last_name, 
-               f.origin, f.destination, f.departure_time, f.flight_id
+               f.origin, f.dest, f.date, f.flight_id
         FROM bookings b
         JOIN passengers p ON b.passenger_id = p.passenger_id
         JOIN flights f ON b.flight_id = f.flight_id
