@@ -13,7 +13,7 @@ def get_db_connection():
 def get_all_cities():
     # Fetches a clean, sorted list of all unique origin cities in the database.
     conn = get_db_connection()
-    cities_query = 'SELECT DISTINCT origin FROM flights ORDER BY origin ASC'
+    cities_query = 'SELECT origin FROM flights UNION SELECT destination From flights ORDER BY origin ASC'
     
     # Extract the string value from each row row['origin']
     db_cities = [row['origin'] for row in  
@@ -22,12 +22,16 @@ def get_all_cities():
     return db_cities
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    origin = "Brisbane"
-    dest = "Melbourne"
     conn = get_db_connection()
-    db_flights = conn.execute('SELECT * FROM flights WHERE origin = ? AND dest = ?',(origin, dest)).fetchall()
+    if request.method == 'POST':
+        origin = request.form.get('origin')
+        dest = request.form.get('dest')
+        db_flights = conn.execute('SELECT * FROM flights WHERE origin = ? AND destination = ?',(origin, dest)).fetchall()
+    else:
+        db_flights = conn.execute('SELECT * FROM flights').fetchall()
+        origin,dest = "",""
     db_cities = get_all_cities()
     return render_template('index.html', flights=db_flights, cities = db_cities)
     
@@ -83,7 +87,7 @@ def booking_confirmation(booking_id):
     # SQL JOIN to grab Passenger, Flight, and Booking details in one query
     query = '''
         SELECT b.booking_id, b.seat_assignment, p.first_name, p.last_name, 
-               f.origin, f.dest, f.date, f.flight_id
+               f.origin, f.destination, f.departure_time, f.flight_id
         FROM bookings b
         JOIN passengers p ON b.passenger_id = p.passenger_id
         JOIN flights f ON b.flight_id = f.flight_id
