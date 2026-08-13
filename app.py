@@ -26,8 +26,9 @@ def get_all_cities():
 def index():
     conn = get_db_connection()
     db_flights = conn.execute('SELECT * FROM flights').fetchall()
-    conn.close()
-    return render_template('index.html', flights=db_flights)
+    db_cities = get_all_cities()
+    return render_template('index.html', flights=db_flights, cities = db_cities)
+    
 
 @app.route('/book/<int:flight_id>', methods=['GET', 'POST'])
 def book_flight(flight_id):
@@ -56,13 +57,13 @@ def book_flight(flight_id):
             INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
             VALUES (?, ?, ?)
         ''', (flight_id, passenger_id, '12A'))
-
+        #grab booking id
         booking_id = cursor.lastrowid
 
         conn.commit()
         conn.close()
 
-        # 4. Redirect back to the homepage after a successful database save
+        # 4. Redirect to confirmation after a successful database save
         return redirect(f"/confirmation/{booking_id}")
 
     else:
