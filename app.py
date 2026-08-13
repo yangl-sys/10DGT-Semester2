@@ -24,8 +24,10 @@ def get_all_cities():
 
 @app.route('/')
 def index():
+    origin = "Brisbane"
+    dest = "Melbourne"
     conn = get_db_connection()
-    db_flights = conn.execute('SELECT * FROM flights').fetchall()
+    db_flights = conn.execute('SELECT * FROM flights WHERE origin = ? AND dest = ?',(origin, dest)).fetchall()
     db_cities = get_all_cities()
     return render_template('index.html', flights=db_flights, cities = db_cities)
     
