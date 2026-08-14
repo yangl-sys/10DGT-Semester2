@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request
 import sqlite3
+import random
 
 app = Flask(__name__)
 
@@ -49,20 +50,27 @@ def book_flight(flight_id):
 
         # 2. Insert the customer into the passengers table securely using tuple syntax
         cursor = conn.cursor()
+
         cursor.execute('''
-            INSERT INTO passengers (first_name, last_name, email, passport_num)
-            VALUES (?, ?, ?, ?)
-        ''', (first, last, email, passport))
+            INSERT INTO passengers (first_name, last_name, email, passport_num) 
+            SELECT ?, ?, ?, ?
+            WHERE NOT EXISTS (
+            SELECT 1 FROM passengers WHERE first_name = ? AND last_name = ? AND email = ? AND passport_num = ?
+            );
+        ''', (first, last, email, passport, first, last, email, passport))
         
         # Grab the auto-generated passenger_id of the person we just inserted
-        passenger_id = cursor.lastrowid
+        passenger_id = cursor.execute('SELECT passenger_id FROM passengers WHERE first_name = ? AND last_name = ? AND email = ? AND passport_num = ?', (first, last, email, passport)).fetchone()['passenger_id']
 
         # 3. Create a matching record in the bookings table to link passenger to flight
         # For now, we will assign a random seat placeholder like '12A'
+        seat = 'A1'
+        while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
+            seat = f'{random.randint(1,30)}{random.choice(["A", "B", "C", "D", "E", "F"])}'
         cursor.execute('''
             INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
             VALUES (?, ?, ?)
-        ''', (flight_id, passenger_id, '12A'))
+        ''', (flight_id, passenger_id, seat))
         #grab booking id
         booking_id = cursor.lastrowid
 
