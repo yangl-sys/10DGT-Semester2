@@ -50,7 +50,7 @@ def book_flight(flight_id):
 
         # 2. Insert the customer into the passengers table securely using tuple syntax
         cursor = conn.cursor()
-
+        #inserts new passenger if they don't already exist in the database
         cursor.execute('''
             INSERT INTO passengers (first_name, last_name, email, passport_num) 
             SELECT ?, ?, ?, ?
@@ -59,12 +59,13 @@ def book_flight(flight_id):
             );
         ''', (first, last, email, passport, first, last, email, passport))
         
-        # Grab the auto-generated passenger_id of the person we just inserted
+        # Grab the passenger id that matches the details
         passenger_id = cursor.execute('SELECT passenger_id FROM passengers WHERE first_name = ? AND last_name = ? AND email = ? AND passport_num = ?', (first, last, email, passport)).fetchone()['passenger_id']
 
         # 3. Create a matching record in the bookings table to link passenger to flight
-        # For now, we will assign a random seat placeholder like '12A'
         seat = 'A1'
+        capacity = cursor.execute("SELECT capacity FROM flights WHERE flight_id = ?",(flight_id,)).fetchone()[0] // 6
+        #randomises seat until it is not taken
         while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
             seat = f'{random.randint(1,30)}{random.choice(["A", "B", "C", "D", "E", "F"])}'
         cursor.execute('''
