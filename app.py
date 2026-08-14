@@ -63,24 +63,26 @@ def book_flight(flight_id):
         passenger_id = cursor.execute('SELECT passenger_id FROM passengers WHERE first_name = ? AND last_name = ? AND email = ? AND passport_num = ?', (first, last, email, passport)).fetchone()['passenger_id']
 
         # 3. Create a matching record in the bookings table to link passenger to flight
-        seat = 'A1'
-        capacity = cursor.execute("SELECT capacity FROM flights WHERE flight_id = ?",(flight_id,)).fetchone()[0] // 6
-        #randomises seat until it is not taken
-        while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
-            seat = f'{random.randint(1,30)}{random.choice(["A", "B", "C", "D", "E", "F"])}'
-        cursor.execute('''
-            INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
-            VALUES (?, ?, ?)
-        ''', (flight_id, passenger_id, seat))
-        #grab booking id
-        booking_id = cursor.lastrowid
+        if cursor.execute('SELECT * FROM bookings WHERE flight_id = ? AND passenger_id = ?',(flight_id,passenger_id)).fetchone() == None:
+            seat = 'A1'
+            capacity = cursor.execute("SELECT capacity FROM flights WHERE flight_id = ?",(flight_id,)).fetchone()[0] // 6
+            #randomises seat until it is not taken
+            while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
+                seat = f'{random.randint(1,capacity)}{random.choice(["A", "B", "C", "D", "E", "F"])}'
+            cursor.execute('''
+                INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
+                VALUES (?, ?, ?)
+            ''', (flight_id, passenger_id, seat))
+            #grab booking id
+            booking_id = cursor.lastrowid
+            conn.commit()
+            conn.close()
 
-        conn.commit()
-        conn.close()
-
-        # 4. Redirect to confirmation after a successful database save
-        return redirect(f"/confirmation/{booking_id}")
-
+            # 4. Redirect to confirmation after a successful database save
+            return redirect(f"/confirmation/{booking_id}")
+        else:
+            conn.close()
+            return "you already have a flight booked"
     else:
         # GET Request: Fetch the details of the specific flight to show on the form page
         flight = conn.execute('SELECT * FROM flights WHERE flight_id = ?', (flight_id,)).fetchone()
