@@ -29,7 +29,8 @@ def index():
     if request.method == 'POST':
         origin = request.form.get('origin')
         dest = request.form.get('dest')
-        db_flights = conn.execute('SELECT * FROM flights WHERE origin = ? AND destination = ?',(origin, dest)).fetchall()
+        date = request.form.get('date').split(" ")[0]
+        db_flights = conn.execute('SELECT * FROM flights WHERE origin = ? AND destination = ? AND departure_time LIKE ?',(origin, dest, f"%{date}%")).fetchall()
     else:
         db_flights = conn.execute('SELECT * FROM flights').fetchall()
         origin,dest = "",""
@@ -111,6 +112,12 @@ def booking_confirmation(booking_id):
         return "Booking Not Found", 404
         
     return render_template('booking_confirmation.html', booking=booking_details)
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    conn = get_db_connection() 
+    db_flights = conn.execute('SELECT * FROM flights').fetchall()
+    return render_template('admin.html',flights=db_flights)
 
 if __name__ == '__main__':
     app.run(debug=True)
