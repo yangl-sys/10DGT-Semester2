@@ -116,8 +116,8 @@ def booking_confirmation(booking_id):
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     conn = get_db_connection() 
-    db_flights = conn.execute('SELECT * FROM flights').fetchall()
-    return render_template('admin.html',flights=db_flights)
+    db_bookings = conn.execute('SELECT * FROM bookings').fetchall()
+    return render_template('admin.html',bookings=db_bookings)
 
 if __name__ == '__main__':
     app.run(debug=True)
