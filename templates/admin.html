@@ -26,13 +26,13 @@
 </nav>
 
 <body>
-    <div class="table-responsive">
-    <table class="table">
+    <div>
+    <table class="table table-responsive table-striped">
         <thead>
             <tr>
             <th scope="col">booking_id</th>
-            <th scope="col">flight_id</th>
-            <th scope="col">passenger_id</th>
+            <th scope="col">flight path</th>
+            <th scope="col">passenger name</th>
             <th scope="col">seat_assignment</th>
             </tr>
         </thead>
@@ -40,11 +40,11 @@
         <tbody>
             <tr>
             <th scope="row">{{book.booking_id}}</th>
-            <td>{{book.flight_id}}</td>
-            <td>{{book.passenger_id}}</td>
+            <td>{{flights[book.flight_id - 1][1]}} to {{flights[book.flight_id - 1][2]}}</td>
+            <td>{{passengers[book.passenger_id-1][1]}} {{passengers[book.passenger_id-1][2]}}</td>
             <td>{{book.seat_assignment}}</td>
             </tr>
-        </tbody>        
+        </tbody>
         {%endfor%}
     </table>
     </div>
