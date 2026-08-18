@@ -82,10 +82,9 @@ for _ in range(50):
 
 # 5. Generate a few existing Bookings (To show data on day one)
 print("-> Linking passengers to flights...")
-for passenger_id in range(1, 15): # Let's book the first 14 passengers onto random flights
+for passenger_id in range(1, 50): # Let's book the first 14 passengers onto random flights
     flight_id = random.randint(1, 12)
     seat = f"{random.randint(1, 30)}{random.choice(['A', 'B', 'C', 'D', 'E', 'F'])}"
-    
     cursor.execute('''
         INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
         VALUES (?, ?, ?)

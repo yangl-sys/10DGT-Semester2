@@ -66,10 +66,16 @@ def book_flight(flight_id):
         # 3. Create a matching record in the bookings table to link passenger to flight
         if cursor.execute('SELECT * FROM bookings WHERE flight_id = ? AND passenger_id = ?',(flight_id,passenger_id)).fetchone() == None:
             seat = 'A1'
+            all_seats = []
             capacity = cursor.execute("SELECT capacity FROM flights WHERE flight_id = ?",(flight_id,)).fetchone()[0] // 6
-            #randomises seat until it is not taken
+            for i in range(1,capacity+1):
+                for x in ["A", "B", "C", "D", "E", "F"]:
+                    all_seats.append(f"{x}{i}") 
+            i = 0
+            #iterates through all possible seats until possible match
             while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
-                seat = f'{random.randint(1,capacity)}{random.choice(["A", "B", "C", "D", "E", "F"])}'
+                seat = all_seats[i]
+                i+=1
             cursor.execute('''
                 INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
                 VALUES (?, ?, ?)
