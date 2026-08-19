@@ -67,26 +67,31 @@ def book_flight(flight_id):
         if cursor.execute('SELECT * FROM bookings WHERE flight_id = ? AND passenger_id = ?',(flight_id,passenger_id)).fetchone() == None:
             seat = 'A1'
             all_seats = []
+            #gets max rows based on capacity of the flight // by number of seats in row (6)
             capacity = cursor.execute("SELECT capacity FROM flights WHERE flight_id = ?",(flight_id,)).fetchone()[0] // 6
             for i in range(1,capacity+1):
                 for x in ["A", "B", "C", "D", "E", "F"]:
                     all_seats.append(f"{x}{i}") 
             i = 0
             #iterates through all possible seats until possible match
-            while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
-                seat = all_seats[i]
-                i+=1
-            cursor.execute('''
-                INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
-                VALUES (?, ?, ?)
-            ''', (flight_id, passenger_id, seat))
-            #grab booking id
-            booking_id = cursor.lastrowid
-            conn.commit()
-            conn.close()
+            try:
+                while seat in {row[0] for row in cursor.execute("SELECT seat_assignment FROM bookings WHERE flight_id = ?",(flight_id,)).fetchall()}:
+                    seat = all_seats[i]
+                    i+=1
+                cursor.execute('''
+                    INSERT INTO bookings (flight_id, passenger_id, seat_assignment)
+                    VALUES (?, ?, ?)
+                ''', (flight_id, passenger_id, seat))
+                #grab booking id
+                booking_id = cursor.lastrowid
+                conn.commit()
+                conn.close()
 
-            # 4. Redirect to confirmation after a successful database save
-            return redirect(f"/confirmation/{booking_id}")
+                # 4. Redirect to confirmation after a successful database save
+                return redirect(f"/confirmation/{booking_id}")
+            except IndexError:
+                #if the code goes through all possible seats and the flight is full, index error will occur, returning a full flight
+                return "flight is full"
         else:
             conn.close()
             return "you already have a flight booked"
