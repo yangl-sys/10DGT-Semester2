@@ -1,3 +1,5 @@
+import select
+
 from flask import Flask, render_template, redirect, url_for, request
 import sqlite3
 import random
@@ -130,6 +132,7 @@ def admin():
     if request.method == "POST":
         booking_id = request.form.get("remove-btn")
         print(booking_id)
+        conn.execute('DELETE FROM bookings WHERE booking_id == ?',(booking_id,))
     db_bookings = conn.execute('SELECT * FROM bookings').fetchall()
     db_passengers = conn.execute('SELECT * FROM passengers').fetchall()
     db_flights = conn.execute('SELECT * FROM flights').fetchall()
