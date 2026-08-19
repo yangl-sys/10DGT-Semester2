@@ -127,9 +127,14 @@ def booking_confirmation(booking_id):
 @app.route('/admin', methods=['GET', 'POST'])
 def admin():
     conn = get_db_connection() 
+    if request.method == "POST":
+        booking_id = request.form.get("remove-btn")
+        print(booking_id)
     db_bookings = conn.execute('SELECT * FROM bookings').fetchall()
     db_passengers = conn.execute('SELECT * FROM passengers').fetchall()
     db_flights = conn.execute('SELECT * FROM flights').fetchall()
+    conn.commit()
+    conn.close()
     return render_template('admin.html',bookings=db_bookings, passengers=db_passengers,flights=db_flights)
 
 if __name__ == '__main__':

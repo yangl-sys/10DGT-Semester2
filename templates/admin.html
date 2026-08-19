@@ -10,7 +10,7 @@
         body { background-color: var(--bg-light); font-family: 'Segoe UI', Roboto, sans-serif; }
         .navbar { background-color: white; border-bottom: 3px solid var(--jetstar-orange); }
         .btn-orange { background-color: var(--jetstar-orange); color: white; font-weight: bold; }
-        .btn-orange:hover { background-color: #e64900; color: white; }
+        .btn-orange:hover { background-color: #e64900; color: white; transform: scale(1.01);}
     </style>
 </head>
 
@@ -34,6 +34,8 @@
             <th scope="col">flight path</th>
             <th scope="col">passenger name</th>
             <th scope="col">seat_assignment</th>
+            <th scope="col">price</th>
+            <th scope="col"> </th>
             </tr>
         </thead>
         {%for book in bookings%}
@@ -43,6 +45,13 @@
             <td>{{flights[book.flight_id - 1][1]}} to {{flights[book.flight_id - 1][2]}}</td>
             <td>{{passengers[book.passenger_id-1][1]}} {{passengers[book.passenger_id-1][2]}}</td>
             <td>{{book.seat_assignment}}</td>
+            <td>{{flights[book.flight_id - 1][5]}}</td> 
+            <td>
+                <form action = "/admin" method = "POST">
+                    <button class = "btn btn-orange" name = "remove-btn" value = "{{book.booking_id}}">Remove Booking</button>
+                </form>
+            </td> 
+
             </tr>
         </tbody>
         {%endfor%}
