@@ -159,10 +159,19 @@ def login():
         if acc == None:
             return "login failed"
         else:
-            return render_template("pbookings.html", first = first, last = last, email = email, passport = passport)
+            print(acc)
+            return redirect(f"/pbookings/{acc[0]}")
+    return render_template("login.html")
         
+
+@app.route('/pbookings/<int:passenger_id>', methods=['GET', 'POST'])
+def pbookings(passenger_id):
+    conn = get_db_connection() 
+    db_bookings = conn.execute('SELECT * FROM bookings WHERE passenger_id == ?',(passenger_id,)).fetchall()
+    db_flights = conn.execute('SELECT * FROM flights').fetchall()
+    conn.commit()
     conn.close()
-    return render_template('login.html')
+    return render_template('pbookings.html',passenger_id = passenger_id, bookings=db_bookings ,flights=db_flights)
 
 if __name__ == '__main__':
     app.run(debug=True)
