@@ -159,7 +159,6 @@ def login():
         if acc == None:
             return "login failed"
         else:
-            print(acc)
             return redirect(f"/pbookings/{acc[0]}")
     return render_template("login.html")
         

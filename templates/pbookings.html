@@ -31,26 +31,20 @@
         <thead>
             <tr>
             <th scope="col">Flight path</th>
+            <th scope="col">Seat</th>
             <th scope="col"></th>
-            <th scope="col">passenger name</th>
-            <th scope="col">seat_assignment</th>
-            <th scope="col">price</th>
-            <th scope="col"> </th>
+            <th scope="col">Price</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
             </tr>
         </thead>
         {%for book in bookings%}
         <tbody>
             <tr>
             <th scope="row">{{flights[book.flight_id - 1][1]}} to {{flights[book.flight_id - 1][2]}}</th>
-            <td></td>
             <td>{{book.seat_assignment}}</td>
-            <td>{{flights[book.flight_id - 1][5]}}</td> 
-            <td>
-                <form action = "/admin" method = "POST">
-                    <button class = "btn btn-orange" name = "remove-btn" value = "{{book.booking_id}}">Remove Booking</button>
-                </form>
-            </td> 
-
+            <td></td>
+            <td>${{flights[book.flight_id - 1][5]}}</td> 
             </tr>
         </tbody>
         {%endfor%}
