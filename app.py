@@ -19,8 +19,7 @@ def get_all_cities():
     cities_query = 'SELECT origin FROM flights UNION SELECT destination From flights ORDER BY origin ASC'
     
     # Extract the string value from each row row['origin']
-    db_cities = [row['origin'] for row in  
-    conn.execute(cities_query).fetchall()]
+    db_cities = [row['origin'] for row in conn.execute(cities_query).fetchall()]
     conn.close()
     return db_cities
 
@@ -123,7 +122,6 @@ def booking_confirmation(booking_id):
     
     if booking_details is None:
         return "Booking Not Found", 404
-        
     return render_template('booking_confirmation.html', booking=booking_details)
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -139,6 +137,32 @@ def admin():
     conn.commit()
     conn.close()
     return render_template('admin.html',bookings=db_bookings, passengers=db_passengers,flights=db_flights)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    conn = get_db_connection() 
+    if request.method == "POST":
+    # 1. Capture the form text inputs using the HTML 'name' attributes
+        first = request.form.get('first_name')
+        last = request.form.get('last_name')
+        email = request.form.get('email')
+        passport = request.form.get('passport')
+        if (first,last,email,passport) == ("admin","admin","admin@admin","admin"):
+            return redirect("/admin")
+        # 2. Insert the customer into the passengers table securely using tuple syntax
+        cursor = conn.cursor()
+        #finds passenger acc
+        acc = cursor.execute('''
+            SELECT 1 FROM passengers WHERE first_name = ? AND last_name = ? AND email = ? AND passport_num = ?
+        ''', (first, last, email, passport)).fetchone()
+        conn.close()
+        if acc == None:
+            return "login failed"
+        else:
+            return render_template("pbookings.html", first = first, last = last, email = email, passport = passport)
+        
+    conn.close()
+    return render_template('login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
