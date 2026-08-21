@@ -129,14 +129,19 @@ def admin():
     conn = get_db_connection() 
     if request.method == "POST":
         booking_id = request.form.get("remove-btn")
-        print(booking_id)
         conn.execute('DELETE FROM bookings WHERE booking_id == ?',(booking_id,))
-    db_bookings = conn.execute('SELECT * FROM bookings').fetchall()
-    db_passengers = conn.execute('SELECT * FROM passengers').fetchall()
-    db_flights = conn.execute('SELECT * FROM flights').fetchall()
-    conn.commit()
-    conn.close()
-    return render_template('admin.html',bookings=db_bookings, passengers=db_passengers,flights=db_flights)
+        name = request.form.get("name")
+        db_bookings = conn.execute('SELECT * FROM bookings WHERE passenger_id = ?', (name,)).fetchall()
+        db_passengers = conn.execute('SELECT * FROM passengers').fetchall()
+        db_flights = conn.execute('SELECT * FROM flights').fetchall()
+        conn.commit()
+        conn.close()
+        return render_template('admin.html',bookings=db_bookings, passengers=db_passengers,flights=db_flights)
+    else:
+        db_passengers = conn.execute('SELECT * FROM passengers').fetchall()
+        conn.commit()
+        conn.close()
+        return render_template('admin.html',passengers=db_passengers)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

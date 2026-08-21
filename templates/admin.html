@@ -11,6 +11,7 @@
         .navbar { background-color: white; border-bottom: 3px solid var(--jetstar-orange); }
         .btn-orange { background-color: var(--jetstar-orange); color: white; font-weight: bold; }
         .btn-orange:hover { background-color: #e64900; color: white; transform: scale(1.01);}
+        .hero-search { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: -50px; }
     </style>
 </head>
 
@@ -26,6 +27,26 @@
 </nav>
 
 <body>
+
+    <div class="hero-search mb-5">
+        <form class="row g-3" action = "/admin" method = "POST">
+            <div class="col-md-4">
+                <label class="form-label fw-bold">From</label>
+                <select class="form-select" name = "name">
+                    <option> Select Name...</option>
+                    {%for i in passengers%}
+                    <option value = "{{i[0]}}">
+                        {{i[1]}} {{i[2]}}
+                    </option>
+                    {%endfor%}
+                </select>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-orange w-100">Go</button>
+            </div>
+        </form>
+    </div>
+
     <div>
     <table class="table table-responsive table-striped">
         <thead>
